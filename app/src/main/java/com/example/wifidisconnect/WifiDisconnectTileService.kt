@@ -6,9 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.net.ConnectivityManager
-import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.service.quicksettings.Tile
@@ -54,6 +52,14 @@ class WifiDisconnectTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
+        if (isLocked) {
+            unlockAndRun { handleClick() }
+        } else {
+            handleClick()
+        }
+    }
+
+    private fun handleClick() {
         if (isWifiConnected()) {
             disconnectWifi()
         } else {
@@ -72,35 +78,18 @@ class WifiDisconnectTileService : TileService() {
 
     /**
      * 断开 Wi-Fi 连接
-     * Android 10+ 使用 bindProcessToNetwork(null) + requestNetwork 方式，
-     * Android 9 及以下直接调用 WifiManager.disconnect()
      */
     private fun disconnectWifi() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val activeNetwork = connectivityManager.activeNetwork
-            if (activeNetwork != null) {
-                connectivityManager.bindProcessToNetwork(null)
-                connectivityManager.unregisterNetworkCallback(networkCallback)
-
-                @Suppress("DEPRECATION")
-                wifiManager.disconnect()
-                Toast.makeText(this, getString(R.string.wifi_disconnected), Toast.LENGTH_SHORT).show()
-            }
+        connectivityManager.bindProcessToNetwork(null)
+        @Suppress("DEPRECATION")
+        val result = wifiManager.disconnect()
+        if (result) {
+            Toast.makeText(this, getString(R.string.wifi_disconnected), Toast.LENGTH_SHORT).show()
         } else {
-            @Suppress("DEPRECATION")
-            if (wifiManager.disconnect()) {
-                Toast.makeText(this, getString(R.string.wifi_disconnected), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, getString(R.string.wifi_disconnect_failed), Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, getString(R.string.wifi_disconnect_failed), Toast.LENGTH_SHORT).show()
         }
         updateTile()
     }
-
-    /**
-     * 用于 Android 10+ 网络监听的回调（占位，防止 unregister 报错）
-     */
-    private val networkCallback = object : ConnectivityManager.NetworkCallback() {}
 
     /**
      * 刷新 Tile 的图标与状态文字

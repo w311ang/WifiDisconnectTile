@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wi-Fi 断开磁贴</string>
+    <string name="tile_label_connected">Wi-Fi 已连接</string>
+    <string name="tile_label_disconnected">Wi-Fi 未连接</string>
+    <string name="wifi_disconnected">已断开 Wi-Fi</string>
+    <string name="wifi_not_connected">当前未连接 Wi-Fi</string>
+    <string name="wifi_disconnect_failed">断开 Wi-Fi 失败</string>
+</resources>

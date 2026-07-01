@@ -23,10 +23,14 @@ class MainActivity : AppCompatActivity() {
         if (isWifiConnected()) {
             @Suppress("DEPRECATION")
             val result = wifiManager.disconnect()
-            val msg = if (result) "已断开 Wi‑Fi" else "断开 Wi‑Fi 失败"
+            val msg = if (result) {
+                getString(R.string.wifi_disconnected)
+            } else {
+                getString(R.string.wifi_disconnect_failed)
+            }
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "当前未连接 Wi‑Fi", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.wifi_not_connected), Toast.LENGTH_SHORT).show()
         }
 
         finish()
